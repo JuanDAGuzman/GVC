@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulario de Clientes</title>
+    <style>
+      .formulario form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .formulario label {
+        display: block;
+      }
+      .formulario input,
+      .formulario textarea {
+        margin-bottom: 10px;
+      }
+      .formulario button {
+        margin-top: 10px;
+      }
+      .tabla table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .tabla th,
+      .tabla td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+      /* Estilos para el menú */
+      nav {
+        background-color: #333;
+        padding: 10px;
+      }
+
+      nav ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav ul li {
+        display: inline-block;
+        position: relative;
+      }
+
+      nav ul li a {
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 15px;
+      }
+
+      nav ul li:hover {
+        background-color: #555;
+      }
+      nav ul li ul.submenu {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 5px;
+        padding: 10px 0;
+      }
+
+      nav ul li ul.submenu li {
+        display: block;
+      }
+
+      nav ul li ul.submenu li a {
+        color: #333;
+        padding: 12px 20px;
+        text-decoration: none;
+        transition: background-color 3s ease; /* Cambia la duración de la transición */
+      }
+
+      nav ul li ul.submenu li a:hover {
+        background-color: #f2f2f2;
+      }
+      h1 {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+      }
+      .container {
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        margin: 20px;
+        flex-wrap: wrap; /* Permite que los elementos se ajusten a la siguiente línea */
+      }
+      .formulario {
+        margin-top: 20px;
+        flex: 0 0 100%; /* El formulario ocupa el 100% del ancho */
+        margin-bottom: 20px; /* Espacio entre el formulario y las tablas */
+      }
+      .tabla {
+        flex: 0 0 48%; /* Cada tabla ocupa el 48% del ancho */
+      }
+      h2 {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+      }
+      #searchInput {
+        margin-bottom: 10px;
+        width: 200px;
+        height: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 16px;
+      }
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        background-color: #333;
+      }
+    </style>
+  </head>
+  <header>
+    <nav>
+      <ul>
+        <li>
+          <a href="#">Menú</a>
+          <ul class="submenu">
+            <li><a href="./facturas">Consultar Facturas</a></li>
+            <li><a href="./ventas">Consultar Ventas</a></li>
+            <li><a href="./acclientes.html">Actualizar Clientes</a></li>
+            <li><a href="./asesor">Consultar Estados</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <body>
+    <div class="container">
+      <div class="formulario">
+        <h1>Formulario Creación De Clientes</h1>
+        <form id="clienteForm">
+          <label for="nombre">Nombre:</label><br />
+          <input type="text" id="nombre" name="nombre" required /><br />
+          <label for="direccion">Dirección:</label><br />
+          <input type="text" id="direccion" name="direccion" /><br />
+          <label for="telefono">Teléfono:</label><br />
+          <input type="text" id="telefono" name="telefono" /><br />
+          <label for="estado_id">ID de Estado:</label><br />
+          <input type="number" id="estado_id" name="estado_id" required /><br />
+          <label for="preferencias">Preferencias:</label><br />
+          <textarea id="preferencias" name="preferencias"></textarea><br />
+          <button type="submit">Crear Cliente</button>
+        </form>
+      </div>
+      <div class="tabla">
+        <h2>Estados del Cliente</h2>
+        <table id="estadosTabla">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody id="estadosTablaBody"></tbody>
+        </table>
+      </div>
+      <div class="tabla">
+        <h2>Clientes</h2>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Buscar clientes..."
+          autocomplete="off"
+        />
+
+        <table id="clientesTabla">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Estado ID</th>
+              <th>Acciones</th>
+              <!-- Nueva columna para el botón -->
+            </tr>
+          </thead>
+          <tbody id="clientesTablaBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let clientes = []; // Array para almacenar todos los clientes
+
+      // Función para obtener y mostrar los clientes
+      async function obtenerClientes() {
+        try {
+          const response = await fetch("http://localhost:3000/api/clientes");
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener los clientes");
+          }
+          clientes = await response.json(); // Almacenar todos los clientes en el array
+          mostrarClientes(clientes); // Mostrar todos los clientes inicialmente
+        } catch (error) {
+          console.error(error.message);
+          alert("Error al obtener los clientes");
+        }
+      }
+      function mostrarClientes(clientesAMostrar) {
+        const clientesTablaBody = document.getElementById("clientesTablaBody");
+        clientesTablaBody.innerHTML = ""; // Limpiar tabla
+
+        clientesAMostrar.forEach((cliente) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${cliente.cliente_id}</td>
+            <td>${cliente.nombre}</td>
+            <td>${cliente.direccion}</td>
+            <td>${cliente.telefono}</td>
+            <td>${cliente.estado_id}</td>
+            <td><button onclick="copiarId(${cliente.cliente_id})">Copiar ID</button></td> <!-- Botón para copiar el ID -->
+          `;
+          clientesTablaBody.appendChild(row);
+        });
+      }
+      // Obtener todos los elementos del menú
+      const menuItems = document.querySelectorAll("nav ul li");
+
+      // Agregar un evento de clic a cada elemento del menú
+      menuItems.forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation(); // Evitar que el clic se propague al documento
+
+          // Alternar la clase 'active' en el elemento del menú
+          item.classList.toggle("active");
+
+          // Obtener el submenú del elemento del menú
+          const submenu = item.querySelector("ul.submenu");
+
+          // Si hay un submenú, alternar su visibilidad
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+      function copiarId(clienteId) {
+        // Crear un elemento de texto temporal
+        const tempInput = document.createElement("input");
+        tempInput.value = clienteId;
+        document.body.appendChild(tempInput);
+
+        // Seleccionar y copiar el contenido del campo de texto
+        tempInput.select();
+        document.execCommand("copy");
+
+        // Eliminar el campo de texto temporal
+        document.body.removeChild(tempInput);
+
+        // Mostrar una notificación o realizar cualquier otra acción
+        alert(`ID ${clienteId} copiado al portapapeles`);
+      }
+
+      // Ocultar el submenú al hacer clic fuera del menú
+      document.addEventListener("click", () => {
+        menuItems.forEach((item) => {
+          const submenu = item.querySelector("ul.submenu");
+          if (submenu && submenu.style.display === "block") {
+            submenu.style.display = "none";
+            item.classList.remove("active");
+          }
+        });
+      });
+      document
+        .getElementById("clienteForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const clienteData = {};
+          formData.forEach((value, key) => {
+            clienteData[key] = value;
+          });
+          try {
+            const response = await fetch("/clientes", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(clienteData),
+            });
+            if (!response.ok) {
+              throw new Error("No se pudo crear el cliente");
+            }
+            alert("Cliente creado exitosamente");
+            e.target.reset();
+          } catch (error) {
+            console.error(error.message);
+            alert("Error al crear el cliente");
+          }
+        });
+
+      function filtrarClientes() {
+        const searchInput = document.getElementById("searchInput");
+        const searchTerm = searchInput.value.toLowerCase();
+
+        const clientesFiltrados = clientes.filter((cliente) =>
+          cliente.nombre.toLowerCase().includes(searchTerm)
+        );
+
+        mostrarClientes(clientesFiltrados);
+      }
+
+      // Evento de búsqueda
+      const searchInput = document.getElementById("searchInput");
+      searchInput.addEventListener("input", filtrarClientes);
+      // Función para obtener y mostrar los estados del cliente
+      async function obtenerEstados() {
+        try {
+          const response = await fetch("http://localhost:3000/api/estados");
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener los estados");
+          }
+          const estados = await response.json();
+          const estadosTablaBody = document.getElementById("estadosTablaBody");
+          estadosTablaBody.innerHTML = ""; // Limpiar tabla
+          estados.forEach((estado) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            <td>${estado.estado_id}</td>
+            <td>${estado.descripcion}</td>
+          `;
+            estadosTablaBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error(error.message);
+          alert("Error al obtener los estados");
+        }
+      }
+
+      function handleScroll() {
+        const header = document.querySelector("header");
+        const scrollPosition =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight,
+          document.body.clientHeight,
+          document.documentElement.clientHeight
+        );
+
+        // Verificar si el contenido es suficientemente largo para permitir el desplazamiento
+        if (scrollHeight > window.innerHeight) {
+          if (scrollPosition > 0) {
+            header.style.position = "fixed";
+            header.style.top = "0";
+            header.style.width = "100%";
+            header.style.backgroundColor = "#333";
+          } else {
+            header.style.position = "static";
+            header.style.backgroundColor = "transparent";
+          }
+        } else {
+          header.style.position = "static";
+          header.style.backgroundColor = "transparent";
+        }
+      }
+
+      // Evento de scroll
+      window.addEventListener("scroll", handleScroll);
+
+      window.onload = () => {
+        obtenerEstados();
+        obtenerClientes();
+      };
+    </script>
+  </body>
+</html>

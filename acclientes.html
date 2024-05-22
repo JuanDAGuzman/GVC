@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actualizacion Datos</title>
+    <style>
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        background-color: #333;
+      }
+      nav {
+        background-color: #333;
+        padding: 10px;
+      }
+
+      nav ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav ul li {
+        display: inline-block;
+        position: relative;
+      }
+
+      nav ul li a {
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 15px;
+      }
+
+      nav ul li:hover {
+        background-color: #555;
+      }
+
+      nav ul li ul.submenu {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 5px;
+        padding: 10px 0;
+      }
+
+      nav ul li ul.submenu li {
+        display: block;
+      }
+
+      nav ul li ul.submenu li a {
+        color: #333;
+        padding: 12px 20px;
+        text-decoration: none;
+        transition: background-color 3s ease; /* Cambia la duración de la transición */
+      }
+
+      nav ul li ul.submenu li a:hover {
+        background-color: #f2f2f2;
+      }
+
+      .form-container {
+        padding-top: 50px;
+        width: 50%; /* Puedes ajustar el ancho según sea necesario */
+        margin: 0 auto; /* Esto centra el contenedor horizontalmente */
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      .form-row {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+      }
+
+      .form-row label {
+        flex: 1;
+      }
+
+      .form-row input[type="text"],
+      .form-row input[type="checkbox"] {
+        flex: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li>
+            <a href="#">Menú</a>
+            <ul class="submenu">
+              <li><a href="./facturas">Consultar Facturas</a></li>
+              <li><a href="./ventas">Consultar Ventas</a></li>
+              <li><a href="./clientes.html">Creación Clientes</a></li>
+              <li><a href="./asesor">Consultar Estados</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="form-container">
+      <h2>Actualizar Cliente</h2>
+      <form id="updateForm">
+        <div class="form-row">
+          <label for="clienteId">ID del Cliente:</label>
+          <input
+            autocomplete="off"
+            type="text"
+            id="clienteId"
+            name="clienteId"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="celular">Celular</label>
+          <input
+            autocomplete="off"
+            type="checkbox"
+            id="checkCelular"
+            name="checkCelular"
+            value="celular"
+          />
+          <input type="text" id="celular" name="celular" disabled />
+        </div>
+
+        <div class="form-row">
+          <label for="direccion">Dirección</label>
+          <input
+            autocomplete="off"
+            type="checkbox"
+            id="checkDireccion"
+            name="checkDireccion"
+            value="direccion"
+          />
+          <input type="text" id="direccion" name="direccion" disabled />
+        </div>
+
+        <div class="form-row">
+          <label for="preferencias">Preferencias</label>
+          <input
+            autocomplete="off"
+            type="checkbox"
+            id="checkPreferencias"
+            name="checkPreferencias"
+            value="preferencias"
+          />
+          <input type="text" id="preferencias" name="preferencias" disabled />
+        </div>
+
+        <div class="form-row">
+          <label for="estadoId">Estado ID</label>
+          <input
+            type="checkbox"
+            id="checkEstadoId"
+            name="checkEstadoId"
+            value="estadoId"
+          />
+          <input type="text" id="estadoId" name="estadoId" disabled />
+        </div>
+
+        <input type="submit" value="Actualizar" />
+      </form>
+    </div>
+
+    <h2>Tabla de Estados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID de Estado</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody id="estadosTablaBody"></tbody>
+    </table>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const clienteIdInput = document.getElementById("clienteId");
+
+        // Agregar un evento de input al campo de ID del Cliente para validar que solo se ingresen números
+        clienteIdInput.addEventListener("input", () => {
+          const regex = /^\d*$/; // Expresión regular que acepta solo dígitos
+
+          if (!regex.test(clienteIdInput.value)) {
+            clienteIdInput.setCustomValidity("Ingrese solo números.");
+          } else {
+            clienteIdInput.setCustomValidity("");
+          }
+        });
+
+        // Agregar evento de submit al formulario para realizar la validación antes de enviar
+        document
+          .getElementById("updateForm")
+          .addEventListener("submit", (event) => {
+            const clienteIdValue = clienteIdInput.value;
+            const regex = /^\d*$/; // Expresión regular que acepta solo dígitos
+
+            // Validar el campo de ID del Cliente antes de enviar el formulario
+            if (!regex.test(clienteIdValue)) {
+              event.preventDefault(); // Evitar que el formulario se envíe
+              clienteIdInput.setCustomValidity("Ingrese solo números.");
+            }
+          });
+      });
+
+      const menuItems = document.querySelectorAll("nav ul li");
+      // Agregar un evento de clic a cada elemento del menú
+      menuItems.forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation(); // Evitar que el clic se propague al documento
+
+          // Alternar la clase 'active' en el elemento del menú
+          item.classList.toggle("active");
+
+          // Obtener el submenú del elemento del menú
+          const submenu = item.querySelector("ul.submenu");
+
+          // Si hay un submenú, alternar su visibilidad
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+      document.addEventListener("click", () => {
+        menuItems.forEach((item) => {
+          const submenu = item.querySelector("ul.submenu");
+          if (submenu && submenu.style.display === "block") {
+            submenu.style.display = "none";
+            item.classList.remove("active");
+          }
+        });
+      });
+      async function obtenerEstados() {
+        try {
+          const response = await fetch("http://localhost:3000/api/estados");
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener los estados");
+          }
+          const estados = await response.json();
+          const estadosTablaBody = document.getElementById("estadosTablaBody");
+          estadosTablaBody.innerHTML = ""; // Limpiar tabla
+          estados.forEach((estado) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${estado.estado_id}</td>
+                        <td>${estado.descripcion}</td>
+                    `;
+            estadosTablaBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error(error.message);
+          alert("Error al obtener los estados");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        obtenerEstados(); // Llamar a la función para cargar los estados cuando la página esté lista
+      });
+
+      document
+        .getElementById("updateForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const clienteId = document.getElementById("clienteId").value;
+          const checkboxes = document.querySelectorAll(
+            'input[type="checkbox"]'
+          );
+          const data = { clienteId };
+
+          checkboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+              const fieldName = checkbox.value;
+              const fieldValue = document.getElementById(fieldName).value;
+              // Corrige la clave para el campo estado_id
+              const dataKey =
+                fieldName === "estadoId" ? "estado_id" : fieldName;
+              data[dataKey] = fieldValue;
+            }
+          });
+
+          try {
+            const response = await fetch(
+              `http://localhost:3000/api/clientes/${clienteId}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error("Error al actualizar el cliente");
+            }
+
+            const responseData = await response.json();
+            console.log(responseData); // Puedes hacer algo con la respuesta del servidor, como mostrar un mensaje de éxito
+            alert("Campo actualizado");
+          } catch (error) {
+            console.error(error);
+          }
+        });
+
+      // Habilitar o deshabilitar los campos según si su checkbox correspondiente está seleccionado
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+          const fieldName = this.value;
+          const fieldInput = document.getElementById(fieldName);
+          fieldInput.disabled = !this.checked;
+          if (!this.checked) {
+            fieldInput.value = ""; // Limpiar el valor si el checkbox se desmarca
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
