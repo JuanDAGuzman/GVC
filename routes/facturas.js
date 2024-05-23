@@ -45,5 +45,44 @@ router.get("/", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+router.get("/:facturaId", async (req, res) => {
+    const { facturaId } = req.params;
+  
+    try {
+      const result = await pool.query(`
+        SELECT 
+          f.factura_id,
+          c.nombre AS nombre_cliente,
+          json_agg(json_build_object(
+            'nombre_producto', p.nombre,
+            'precio_total', vp.precio_unitario * vp.cantidad,
+            'cantidad', vp.cantidad
+          )) AS productos
+        FROM 
+          Factura f
+        INNER JOIN 
+          Venta v ON f.venta_id = v.venta_id
+        INNER JOIN 
+          Cliente c ON v.cliente_id = c.cliente_id
+        INNER JOIN 
+          VentaProducto vp ON v.venta_id = vp.venta_id
+        INNER JOIN 
+          ProductoServicio p ON vp.producto_id = p.producto_id
+        WHERE 
+          f.factura_id = $1
+        GROUP BY 
+          f.factura_id, c.nombre
+      `, [facturaId]);
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Factura no encontrada' });
+      }
+  
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
+    }
+  });
 
 module.exports = router;

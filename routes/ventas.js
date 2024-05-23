@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const pool = require('../db');
+const pool = require("../db");
 
 // Crear una nueva venta
 router.post("/", async (req, res) => {
@@ -41,12 +41,13 @@ router.post("/", async (req, res) => {
       [venta_id, asesor_id]
     );
 
-    // Obtener el historial de compras actual del cliente
     const historialComprasResult = await client.query(
       "SELECT historial_compras FROM DetallesCliente WHERE cliente_id = $1",
       [cliente_id]
     );
-    const historialCompras = historialComprasResult.rows[0]?.historial_compras || [];
+    const historialComprasData =
+      historialComprasResult.rows[0]?.historial_compras || "[]";
+    const historialCompras = JSON.parse(historialComprasData);
 
     // Agregar la nueva venta al historial de compras
     const nuevaVenta = { venta_id, fecha_venta, total };

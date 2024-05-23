@@ -53,6 +53,7 @@
       }
       .formulario {
         margin: 20px;
+        padding-top: 40px;
       }
       .formulario form {
         display: flex;
@@ -102,6 +103,14 @@
       .formulario div input[type="number"] {
         flex: 2;
       }
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        background-color: #333;
+      }
     </style>
   </head>
   <header>
@@ -110,10 +119,11 @@
         <li>
           <a href="#">Menú</a>
           <ul class="submenu">
-            <li><a href="./acclientes.html">Actualizar Datos Cliente</a></li>
-            <li><a href="./ventas.html">Generar Ventas</a></li>
+            <li><a href="./acclientes.html">Gestión Datos Cliente</a></li>
+            <li><a href="./ventas.html">Gestión Ventas</a></li>
             <li><a href="./clientes.html">Gestion De Clientes</a></li>
             <li><a href="./productos.html">Gestión De Productos</a></li>
+            <li><a href="./facturas.html">Gestión De Facturas</a></li>
           </ul>
         </li>
       </ul>
@@ -124,11 +134,30 @@
       <h1>Crear Producto</h1>
       <form id="crearProductoForm">
         <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required />
+        <input
+          autocomplete="off"
+          type="text"
+          id="nombre"
+          name="nombre"
+          required
+        />
         <label for="descripcion">Descripción:</label>
-        <input type="text" id="descripcion" name="descripcion" required />
+        <input
+          autocomplete="off"
+          type="text"
+          id="descripcion"
+          name="descripcion"
+          required
+        />
         <label for="precio">Precio:</label>
-        <input type="number" id="precio" name="precio" step="0.01" required />
+        <input
+          autocomplete="off"
+          type="number"
+          id="precio"
+          name="precio"
+          step="0.01"
+          required
+        />
         <button type="submit">Crear Producto</button>
       </form>
     </div>
@@ -189,43 +218,39 @@
       </table>
     </div>
     <div class="tabla">
-        <h2>Estados del Cliente</h2>
-        <table id="estadosTabla">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody id="estadosTablaBody"></tbody>
-        </table>
-      </div>
-      <div class="tablaclientes">
-        <h2>Clientes</h2>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Buscar clientes..."
-          autocomplete="off"
-        />
-
-        <table id="clientesTabla">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Dirección</th>
-              <th>Teléfono</th>
-              <th>Estado ID</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="clientesTablaBody"></tbody>
-        </table>
-      </div>
+      <h2>Estados del Cliente</h2>
+      <table id="estadosTabla">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody id="estadosTablaBody"></tbody>
+      </table>
     </div>
-
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        cargarProductos();
+        obtenerEstados();
+      });
+
+
+
+
+
+
+
+      function copiarId(clienteId) {
+        const tempInput = document.createElement("input");
+        tempInput.value = clienteId;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert(`ID ${clienteId} copiado al portapapeles`);
+      }
+
       const menuItems = document.querySelectorAll("nav ul li");
       menuItems.forEach((item) => {
         item.addEventListener("click", (event) => {
@@ -344,6 +369,28 @@
             console.error("Error al cargar productos:", error);
           });
       }
+      async function obtenerEstados() {
+        try {
+          const response = await fetch("http://localhost:3000/api/estados");
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener los estados");
+          }
+          const estados = await response.json();
+          const estadosTablaBody = document.getElementById("estadosTablaBody");
+
+          estados.forEach((estado) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            <td>${estado.estado_id}</td>
+            <td>${estado.descripcion}</td>
+          `;
+            estadosTablaBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error(error.message);
+          alert("Error al obtener los estados");
+        }
+      }
 
       document
         .getElementById("checkNombre")
@@ -362,9 +409,17 @@
         .addEventListener("change", function () {
           document.getElementById("nuevoPrecio").disabled = !this.checked;
         });
-
-      // Cargar productos al inicio
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          const searchValue = this.value.toLowerCase();
+          const filteredClientes = clientes.filter((cliente) =>
+            cliente.nombre.toLowerCase().includes(searchValue)
+          );
+          mostrarClientes(filteredClientes);
+        });
       cargarProductos();
+      obtenerEstados();
     </script>
   </body>
 </html>

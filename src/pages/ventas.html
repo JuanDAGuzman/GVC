@@ -5,9 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generar Ventas</title>
     <style>
-      /* Estilos para la interfaz general */
       body {
         font-family: Arial, sans-serif;
+      }
+      .formulario {
+        padding-top: 40px;
+      }
+      .formulario form {
+        display: flex;
+        flex-direction: column;
+        max-width: 400px;
+        margin: auto;
+      }
+      .formulario label,
+      .formulario input,
+      .formulario button,
+      .formulario div {
+        margin-bottom: 10px;
+      }
+      .formulario div {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .formulario div label {
+        flex: 1;
+        text-align: right;
+        margin-right: 10px;
+      }
+      .formulario div input[type="text"],
+      .formulario div input[type="number"] {
+        flex: 2;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #333;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      .container {
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        margin: 20px;
+        flex-wrap: wrap;
       }
       nav {
         background-color: #333;
@@ -53,59 +103,6 @@
       nav ul li ul.submenu li a:hover {
         background-color: #f2f2f2;
       }
-      h1,
-      h2 {
-        text-align: center;
-        font-weight: bold;
-      }
-      .container {
-        text-align: center;
-        display: flex;
-        justify-content: space-between;
-        margin: 20px;
-        flex-wrap: wrap;
-      }
-      .formulario {
-        margin-top: 20px;
-        flex: 0 0 100%;
-        margin-bottom: 20px;
-      }
-      .formulario form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .formulario label {
-        display: block;
-      }
-      .formulario input,
-      .formulario textarea {
-        margin-bottom: 10px;
-      }
-      .formulario button {
-        margin-top: 10px;
-      }
-      .tabla {
-        flex: 0 0 48%;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-      }
-      table,
-      th,
-      td {
-        border: 1px solid #333;
-      }
-      th,
-      td {
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
       #searchInput {
         margin-bottom: 10px;
         width: 200px;
@@ -115,7 +112,27 @@
         padding: 5px;
         font-size: 16px;
       }
-      .create-client-button {
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        background-color: #333;
+      }
+      h1 {
+        margin: 10px;
+        color: black;
+        text-align: center;
+        font-size: 30px;
+      }
+      h2 {
+        margin: 10px;
+        color: black;
+        text-align: center;
+        font-size: 30px;
+      }
+      .generate-sale {
         margin-top: 10px;
         margin-bottom: 10px;
         width: 200px;
@@ -128,9 +145,10 @@
         color: #fff;
         cursor: pointer;
       }
-      .create-client-button:hover {
+      .generate-sale:hover {
         background-color: #555;
-        transition: background-color 0.8s ease;
+
+        transition: background-color 0.8s ease; /* Animación de transición */
       }
       .copy-button {
         background-color: white;
@@ -138,7 +156,15 @@
       }
       .copy-button:hover {
         background-color: #555;
-        transition: background-color 0.8s ease;
+        transition: background-color 0.8s ease; /* Animación de transición */
+      }
+      /* Estilos para centrar la tabla horizontalmente */
+      .container-table {
+        padding-left: -100px;
+      }
+      .tabla-productos {
+        width: 50%; /* Establece el ancho al 50% de la página */
+        margin: auto; /* Centra horizontalmente la tabla */
       }
     </style>
   </head>
@@ -148,28 +174,29 @@
         <li>
           <a href="#">Menú</a>
           <ul class="submenu">
-            <li><a href="./acclientes.html">Actualizar Datos Cliente</a></li>
-            <li><a href="./ventas.html">Generar Ventas</a></li>
+            <li><a href="./acclientes.html">Gestión Datos Cliente</a></li>
+            <li><a href="./ventas.html">Gestión Ventas</a></li>
             <li><a href="./clientes.html">Gestion De Clientes</a></li>
             <li><a href="./productos.html">Gestión De Productos</a></li>
+            <li><a href="./facturas.html">Gestión De Facturas</a></li>
           </ul>
         </li>
       </ul>
     </nav>
   </header>
   <body>
-    <div class="container">
-      <div class="formulario">
-        <h1>Generar Venta</h1>
-        <form id="crearVentaForm">
-          <label for="cliente_id">ID del Cliente:</label>
-          <input type="number" id="cliente_id" name="cliente_id" required />
-          <label for="asesor_id">ID del Asesor:</label>
-          <input type="number" id="asesor_id" name="asesor_id" required />
-          <label for="fecha_venta">Fecha de Venta:</label>
-          <input type="date" id="fecha_venta" name="fecha_venta" required />
-          <h2>Productos</h2>
-          <table id="tablaProductos">
+    <div class="formulario">
+      <h1>Generar Venta</h1>
+      <form id="crearVentaForm">
+        <label for="cliente_id">ID del Cliente:</label>
+        <input type="number" id="cliente_id" name="cliente_id" required />
+        <label for="asesor_id">ID del Asesor:</label>
+        <input type="number" id="asesor_id" name="asesor_id" required />
+        <label for="fecha_venta">Fecha de Venta:</label>
+        <input type="date" id="fecha_venta" name="fecha_venta" required />
+        <h2>Productos</h2>
+        <div class="container-table">
+          <table id="tablaProductos" class="tabla-productos">
             <thead>
               <tr>
                 <th>Seleccionar</th>
@@ -180,42 +207,28 @@
                 <th>Cantidad</th>
               </tr>
             </thead>
-            <tbody>
-              <!-- Filas de productos serán insertadas aquí -->
-            </tbody>
+            <tbody></tbody>
           </table>
-          <button type="submit">Generar Venta</button>
-        </form>
-      </div>
+        </div>
+        <button class="generate-sale" type="submit">Generar Venta</button>
+      </form>
+    </div>
 
-      <div class="tabla">
-        <h1>Lista de Ventas</h1>
-        <table id="tablaVentas">
-          <thead>
-            <tr>
-              <th>ID Asesor</th>
-              <th>Nombre Asesor</th>
-              <th>Ventas Realizadas</th>
-              <th>Total Ventas</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Filas de ventas serán insertadas aquí -->
-          </tbody>
-        </table>
-      </div>
-      <div class="tabla">
-        <h2>Estados del Cliente</h2>
-        <table id="estadosTabla">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody id="estadosTablaBody"></tbody>
-        </table>
-      </div>
+    <div>
+      <h1>Lista de Ventas</h1>
+      <table id="tablaVentas">
+        <thead>
+          <tr>
+            <th>ID Asesor</th>
+            <th>Nombre Asesor</th>
+            <th>Ventas Realizadas</th>
+            <th>Total Ventas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas de ventas serán insertadas aquí -->
+        </tbody>
+      </table>
       <div class="tabla">
         <h2>Clientes</h2>
         <input
@@ -224,6 +237,7 @@
           placeholder="Buscar clientes..."
           autocomplete="off"
         />
+
         <table id="clientesTabla">
           <thead>
             <tr>
@@ -241,11 +255,75 @@
     </div>
 
     <script>
+      let clientes = []; // Array para almacenar todos los clientes
+
+      // Función para obtener y mostrar los clientes
+      async function obtenerClientes() {
+        try {
+          const response = await fetch("http://localhost:3000/api/clientes");
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener los clientes");
+          }
+          clientes = await response.json(); // Almacenar todos los clientes en el array
+          mostrarClientes(clientes); // Mostrar todos los clientes inicialmente
+        } catch (error) {
+          console.error(error.message);
+          alert("Error al obtener los clientes");
+        }
+      }
+      function mostrarClientes(clientesAMostrar) {
+        const clientesTablaBody = document.getElementById("clientesTablaBody");
+        clientesTablaBody.innerHTML = ""; // Limpiar tabla
+
+        clientesAMostrar.forEach((cliente) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+          <td>${cliente.cliente_id}</td>
+          <td>${cliente.nombre}</td>
+          <td>${cliente.direccion}</td>
+          <td>${cliente.telefono}</td>
+          <td>${cliente.estado_id}</td>
+          <td><button class="copy-button" onclick="copiarId(${cliente.cliente_id})">
+            <img src="./icons/copy.png" alt="Copiar" width="20" height="20">
+          </button></td>
+        `;
+          clientesTablaBody.appendChild(row);
+        });
+      }
+      function copiarId(clienteId) {
+        const tempInput = document.createElement("input");
+        tempInput.value = clienteId;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert(`ID ${clienteId} copiado al portapapeles`);
+      }
+      const menuItems = document.querySelectorAll("nav ul li");
+
+      menuItems.forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation();
+          item.classList.toggle("active");
+          const submenu = item.querySelector("ul.submenu");
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+      document.addEventListener("click", () => {
+        menuItems.forEach((item) => {
+          const submenu = item.querySelector("ul.submenu");
+          if (submenu) {
+            submenu.style.display = "none";
+          }
+        });
+      });
+
       document.addEventListener("DOMContentLoaded", () => {
         cargarProductos();
         cargarVentas();
-        obtenerClientes();
-        obtenerEstados();
       });
 
       function cargarProductos() {
@@ -264,12 +342,69 @@
               <td>${producto.nombre}</td>
               <td>${producto.descripcion}</td>
               <td>${producto.precio}</td>
-              <td><input type="number" class="producto-cantidad" min="1" value="1"></td>
+              <td><input type="number" class="producto-cantidad" data-producto-id="${producto.producto_id}" min="1" disabled></td>
             `;
               tbody.appendChild(row);
             });
+
+            document
+              .querySelectorAll(".producto-checkbox")
+              .forEach((checkbox) => {
+                checkbox.addEventListener("change", function () {
+                  const cantidadInput = document.querySelector(
+                    `.producto-cantidad[data-producto-id="${this.dataset.productoId}"]`
+                  );
+                  cantidadInput.disabled = !this.checked;
+                  if (!this.checked) cantidadInput.value = "";
+                });
+              });
+          })
+          .catch((error) => {
+            console.error("Error al cargar productos:", error);
           });
       }
+
+      document
+        .getElementById("crearVentaForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const cliente_id = document.getElementById("cliente_id").value;
+          const asesor_id = document.getElementById("asesor_id").value;
+          const fecha_venta = document.getElementById("fecha_venta").value;
+
+          const productos = [];
+          document
+            .querySelectorAll(".producto-checkbox:checked")
+            .forEach((checkbox) => {
+              const producto_id = checkbox.dataset.productoId;
+              const precio_unitario = checkbox.dataset.productoPrecio;
+              const cantidad = document.querySelector(
+                `.producto-cantidad[data-producto-id="${producto_id}"]`
+              ).value;
+              productos.push({ producto_id, cantidad, precio_unitario });
+            });
+
+          const venta = { cliente_id, asesor_id, fecha_venta, productos };
+
+          try {
+            const response = await fetch("http://localhost:3000/api/ventas", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(venta),
+            });
+            if (!response.ok) {
+              throw new Error("No se pudo generar la venta");
+            }
+            alert("Venta generada exitosamente");
+            document.getElementById("crearVentaForm").reset();
+            cargarVentas();
+          } catch (error) {
+            console.error(error.message);
+            alert("Error al generar la venta");
+          }
+        });
 
       function cargarVentas() {
         fetch("http://localhost:3000/api/ventas")
@@ -289,120 +424,11 @@
             `;
               tbody.appendChild(row);
             });
+          })
+          .catch((error) => {
+            console.error("Error al cargar ventas:", error);
           });
       }
-
-      document
-        .getElementById("crearVentaForm")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const cliente_id = document.getElementById("cliente_id").value;
-          const asesor_id = document.getElementById("asesor_id").value;
-          const fecha_venta = document.getElementById("fecha_venta").value;
-          const productosSeleccionados = [];
-
-          document
-            .querySelectorAll(".producto-checkbox:checked")
-            .forEach((checkbox) => {
-              const cantidad = checkbox
-                .closest("tr")
-                .querySelector(".producto-cantidad").value;
-              productosSeleccionados.push({
-                producto_id: checkbox.dataset.productoId,
-                cantidad: parseInt(cantidad, 10),
-                precio: parseFloat(checkbox.dataset.productoPrecio),
-              });
-            });
-
-          const venta = {
-            cliente_id,
-            asesor_id,
-            fecha_venta,
-            productos: productosSeleccionados,
-          };
-
-          try {
-            const response = await fetch("http://localhost:3000/api/ventas", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(venta),
-            });
-
-            if (!response.ok) {
-              throw new Error("No se pudo crear la venta");
-            }
-
-            alert("Venta creada exitosamente");
-            cargarVentas();
-            document.getElementById("crearVentaForm").reset();
-          } catch (error) {
-            console.error(error.message);
-            alert("Error al crear la venta");
-          }
-        });
-
-      let clientes = [];
-      async function obtenerClientes() {
-        try {
-          const response = await fetch("http://localhost:3000/api/clientes");
-          if (!response.ok)
-            throw new Error("No se pudieron obtener los clientes");
-          clientes = await response.json();
-          mostrarClientes(clientes);
-        } catch (error) {
-          console.error(error.message);
-          alert("Error al obtener los clientes");
-        }
-      }
-
-      function mostrarClientes(clientesAMostrar) {
-        const clientesTablaBody = document.getElementById("clientesTablaBody");
-        clientesTablaBody.innerHTML = "";
-        clientesAMostrar.forEach((cliente) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-          <td>${cliente.cliente_id}</td>
-          <td>${cliente.nombre}</td>
-          <td>${cliente.direccion}</td>
-          <td>${cliente.telefono}</td>
-          <td>${cliente.estado_id}</td>
-          <td><button class="copy-button" onclick="copiarId(${cliente.cliente_id})">
-            <img src="./icons/copy.png" alt="Copiar" width="20" height="20">
-          </button></td>
-        `;
-          clientesTablaBody.appendChild(row);
-        });
-      }
-
-      function copiarId(clienteId) {
-        const tempInput = document.createElement("input");
-        tempInput.value = clienteId;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
-        alert(`ID ${clienteId} copiado al portapapeles`);
-      }
-
-      async function obtenerEstados() {
-        try {
-          const response = await fetch("http://localhost:3000/api/estados");
-          if (!response.ok)
-            throw new Error("No se pudieron obtener los estados");
-          const estados = await response.json();
-          const estadosTablaBody = document.getElementById("estadosTablaBody");
-          estados.forEach((estado) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `<td>${estado.estado_id}</td><td>${estado.descripcion}</td>`;
-            estadosTablaBody.appendChild(row);
-          });
-        } catch (error) {
-          console.error(error.message);
-          alert("Error al obtener los estados");
-        }
-      }
-
       document
         .getElementById("searchInput")
         .addEventListener("input", function () {
@@ -413,25 +439,9 @@
           mostrarClientes(filteredClientes);
         });
 
-      const menuItems = document.querySelectorAll("nav ul li");
-      menuItems.forEach((item) => {
-        item.addEventListener("click", (event) => {
-          event.stopPropagation();
-          item.classList.toggle("active");
-          const submenu = item.querySelector("ul.submenu");
-          if (submenu) {
-            submenu.style.display =
-              submenu.style.display === "block" ? "none" : "block";
-          }
-        });
-      });
-
-      document.addEventListener("click", () => {
-        menuItems.forEach((item) => {
-          const submenu = item.querySelector("ul.submenu");
-          if (submenu) submenu.style.display = "none";
-        });
-      });
+      // Inicializar la página obteniendo clientes y estados
+      obtenerClientes();
+      obtenerEstados();
     </script>
   </body>
 </html>

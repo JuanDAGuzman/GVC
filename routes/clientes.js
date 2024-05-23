@@ -73,35 +73,57 @@ router.patch("/:cliente_id", async (req, res) => {
 
 // Obtener las facturas de un cliente específico
 router.get("/:cliente_id/facturas", async (req, res) => {
-  try {
-    const { cliente_id } = req.params;
-
-    // Consultar las facturas del cliente
-    const result = await pool.query(
-      `
-        SELECT f.factura_id, f.fecha_emision, f.total
-        FROM Factura f
-        JOIN Venta v ON f.venta_id = v.venta_id
-        WHERE v.cliente_id = $1;
-      `,
-      [cliente_id]
-    );
-
-    // Verificar si se encontraron facturas para el cliente
-    if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No se encontraron facturas para este cliente" });
+    try {
+      const { cliente_id } = req.params;
+  
+      // Consultar las facturas del cliente
+      const result = await pool.query(
+        `
+          SELECT 
+            f.factura_id,
+            f.fecha_emision,
+            f.total,
+            c.nombre AS nombre_cliente,
+            json_agg(json_build_object(
+              'nombre_producto', p.nombre,
+              'precio_unitario', vp.precio_unitario,
+              'cantidad', vp.cantidad
+            )) AS productos
+          FROM 
+            Factura f
+          JOIN 
+            Venta v ON f.venta_id = v.venta_id
+          JOIN 
+            Cliente c ON v.cliente_id = c.cliente_id
+          JOIN 
+            VentaProducto vp ON v.venta_id = vp.venta_id
+          JOIN 
+            ProductoServicio p ON vp.producto_id = p.producto_id
+          WHERE 
+            v.cliente_id = $1
+          GROUP BY 
+            f.factura_id, c.nombre;
+        `,
+        [cliente_id]
+      );
+  
+      // Verificar si se encontraron facturas para el cliente
+      if (result.rows.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No se encontraron facturas para este cliente" });
+      }
+  
+      // Devolver las facturas del cliente con detalles adicionales
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server Error");
     }
+  });
 
-    // Devolver las facturas del cliente
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
-
+  
+  
 // Crear un nuevo cliente
 router.post("/", async (req, res) => {
   try {

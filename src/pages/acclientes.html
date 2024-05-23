@@ -98,6 +98,45 @@
       .form-row input[type="checkbox"] {
         flex: 2;
       }
+      .form {
+        margin-top: 20px;
+        flex: 0 0 100%;
+        margin-bottom: 20px;
+      }
+      .form form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .form label {
+        display: block;
+      }
+      .form input,
+      .form textarea {
+        margin-bottom: 10px;
+      }
+      .form button {
+        margin-top: 10px;
+      }
+      .tablaclientes table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .tablaclientes th,
+      .tablaclientes td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+      #searchInput {
+        margin-bottom: 10px;
+        width: 200px;
+        height: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 16px;
+      }
     </style>
   </head>
   <body>
@@ -107,10 +146,11 @@
           <li>
             <a href="#">Menú</a>
             <ul class="submenu">
-              <li><a href="./acclientes.html">Actualizar Datos Cliente</a></li>
-              <li><a href="./ventas.html">Generar Ventas</a></li>
+              <li><a href="./acclientes.html">Gestión Datos Cliente</a></li>
+              <li><a href="./ventas.html">Gestión Ventas</a></li>
               <li><a href="./clientes.html">Gestion De Clientes</a></li>
               <li><a href="./productos.html">Gestión De Productos</a></li>
+              <li><a href="./facturas.html">Gestión De Facturas</a></li>
             </ul>
           </li>
         </ul>
@@ -190,8 +230,78 @@
       </thead>
       <tbody id="estadosTablaBody"></tbody>
     </table>
+    <div class="tablaclientes">
+      <h2>Clientes</h2>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Buscar clientes..."
+        autocomplete="off"
+      />
+
+      <table id="clientesTabla">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Estado ID</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="clientesTablaBody"></tbody>
+      </table>
+    </div>
 
     <script>
+      let clientes = []; // Array para almacenar todos los clientes
+
+      // Función para obtener y mostrar los clientes
+      async function obtenerClientes() {
+        try {
+          const response = await fetch("http://localhost:3000/api/clientes");
+          if (!response.ok) {
+            throw new Error("No se pudieron obtener los clientes");
+          }
+          clientes = await response.json(); // Almacenar todos los clientes en el array
+          mostrarClientes(clientes); // Mostrar todos los clientes inicialmente
+        } catch (error) {
+          console.error(error.message);
+          alert("Error al obtener los clientes");
+        }
+      }
+
+      function mostrarClientes(clientesAMostrar) {
+        const clientesTablaBody = document.getElementById("clientesTablaBody");
+        clientesTablaBody.innerHTML = ""; // Limpiar tabla
+
+        clientesAMostrar.forEach((cliente) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+    <td>${cliente.cliente_id}</td>
+    <td>${cliente.nombre}</td>
+    <td>${cliente.direccion}</td>
+    <td>${cliente.telefono}</td>
+    <td>${cliente.estado_id}</td>
+    <td><button class="copy-button" onclick="copiarId(${cliente.cliente_id})">
+      <img src="./icons/copy.png" alt="Copiar" width="20" height="20">
+    </button></td>
+  `;
+          clientesTablaBody.appendChild(row);
+        });
+      }
+
+      function copiarId(clienteId) {
+        const tempInput = document.createElement("input");
+        tempInput.value = clienteId;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert(`ID ${clienteId} copiado al portapapeles`);
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         const clienteIdInput = document.getElementById("clienteId");
 
@@ -334,6 +444,17 @@
           }
         });
       });
+      // Filtro de búsqueda de clientes
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          const searchValue = this.value.toLowerCase();
+          const filteredClientes = clientes.filter((cliente) =>
+            cliente.nombre.toLowerCase().includes(searchValue)
+          );
+          mostrarClientes(filteredClientes);
+        });
+      obtenerClientes();
     </script>
   </body>
 </html>
