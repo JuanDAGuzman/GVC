@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión De Productos</title>
+    <style>
+      /* Estilos generales */
+      header,
+      nav {
+        background-color: #333;
+        color: #fff;
+      }
+      nav ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav ul li {
+        display: inline-block;
+        position: relative;
+      }
+      nav ul li a {
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 15px;
+      }
+      nav ul li:hover {
+        background-color: #555;
+      }
+      nav ul li ul.submenu {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 5px;
+        padding: 10px 0;
+      }
+      nav ul li ul.submenu li {
+        display: block;
+      }
+      nav ul li ul.submenu li a {
+        color: #333;
+        padding: 12px 20px;
+        text-decoration: none;
+        transition: background-color 3s ease;
+      }
+      nav ul li ul.submenu li a:hover {
+        background-color: #f2f2f2;
+      }
+      .formulario {
+        margin: 20px;
+      }
+      .formulario form {
+        display: flex;
+        flex-direction: column;
+        max-width: 400px;
+        margin: auto;
+      }
+      .formulario label,
+      .formulario input,
+      .formulario button,
+      .formulario div {
+        margin-bottom: 10px;
+      }
+      .formulario div {
+        display: flex;
+        align-items: center;
+      }
+      .formulario input[type="checkbox"] {
+        margin-right: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #333;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      .formulario div {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .formulario div label {
+        flex: 1;
+        text-align: right;
+        margin-right: 10px;
+      }
+      .formulario div input[type="text"],
+      .formulario div input[type="number"] {
+        flex: 2;
+      }
+    </style>
+  </head>
+  <header>
+    <nav>
+      <ul>
+        <li>
+          <a href="#">Menú</a>
+          <ul class="submenu">
+            <li><a href="./acclientes.html">Actualizar Datos Cliente</a></li>
+            <li><a href="./ventas.html">Generar Ventas</a></li>
+            <li><a href="./clientes.html">Gestion De Clientes</a></li>
+            <li><a href="./productos.html">Gestión De Productos</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <body>
+    <div class="formulario">
+      <h1>Crear Producto</h1>
+      <form id="crearProductoForm">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required />
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripcion" name="descripcion" required />
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" name="precio" step="0.01" required />
+        <button type="submit">Crear Producto</button>
+      </form>
+    </div>
+    <div class="formulario">
+      <h1>Editar Producto</h1>
+      <form id="editarProductoForm">
+        <label for="editarProductoId">ID del Producto:</label>
+        <input
+          type="number"
+          id="editarProductoId"
+          name="producto_id"
+          required
+        />
+        <div>
+          <input type="checkbox" id="checkNombre" />
+          <label for="nuevoNombre">Nuevo Nombre:</label>
+          <input type="text" id="nuevoNombre" name="nombre" disabled />
+        </div>
+        <div>
+          <input type="checkbox" id="checkDescripcion" />
+          <label for="nuevaDescripcion">Nueva Descripción:</label>
+          <input
+            type="text"
+            id="nuevaDescripcion"
+            name="descripcion"
+            disabled
+          />
+        </div>
+        <div>
+          <input type="checkbox" id="checkPrecio" />
+          <label for="nuevoPrecio">Nuevo Precio:</label>
+          <input
+            type="number"
+            id="nuevoPrecio"
+            name="precio"
+            step="0.01"
+            disabled
+          />
+        </div>
+        <button type="submit">Editar Producto</button>
+      </form>
+    </div>
+
+    <div>
+      <h1>Lista de Productos</h1>
+      <table id="tablaProductos">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas de productos serán insertadas aquí -->
+        </tbody>
+      </table>
+    </div>
+    <div class="tabla">
+        <h2>Estados del Cliente</h2>
+        <table id="estadosTabla">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody id="estadosTablaBody"></tbody>
+        </table>
+      </div>
+      <div class="tablaclientes">
+        <h2>Clientes</h2>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Buscar clientes..."
+          autocomplete="off"
+        />
+
+        <table id="clientesTabla">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Estado ID</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="clientesTablaBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const menuItems = document.querySelectorAll("nav ul li");
+      menuItems.forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation();
+          item.classList.toggle("active");
+          const submenu = item.querySelector("ul.submenu");
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+      document.addEventListener("click", () => {
+        menuItems.forEach((item) => {
+          const submenu = item.querySelector("ul.submenu");
+          if (submenu && submenu.style.display === "block") {
+            submenu.style.display = "none";
+            item.classList.remove("active");
+          }
+        });
+      });
+
+      document
+        .getElementById("crearProductoForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const nombre = document.getElementById("nombre").value;
+          const descripcion = document.getElementById("descripcion").value;
+          const precio = document.getElementById("precio").value;
+
+          const producto = { nombre, descripcion, precio };
+
+          try {
+            const response = await fetch(
+              "http://localhost:3000/api/productos",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(producto),
+              }
+            );
+            if (!response.ok) {
+              throw new Error("No se pudo crear el producto");
+            }
+            alert("Producto creado exitosamente");
+            document.getElementById("crearProductoForm").reset();
+            cargarProductos();
+          } catch (error) {
+            console.error(error.message);
+            alert("Error al crear el producto");
+          }
+        });
+
+      document
+        .getElementById("editarProductoForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const producto_id = document.getElementById("editarProductoId").value;
+          const nombre = document.getElementById("nuevoNombre").value;
+          const descripcion = document.getElementById("nuevaDescripcion").value;
+          const precio = document.getElementById("nuevoPrecio").value;
+
+          const producto = {};
+          if (document.getElementById("checkNombre").checked)
+            producto.nombre = nombre;
+          if (document.getElementById("checkDescripcion").checked)
+            producto.descripcion = descripcion;
+          if (document.getElementById("checkPrecio").checked)
+            producto.precio = precio;
+
+          try {
+            const response = await fetch(
+              `http://localhost:3000/api/productos/${producto_id}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(producto),
+              }
+            );
+            if (!response.ok) {
+              throw new Error("No se pudo editar el producto");
+            }
+            alert("Producto editado exitosamente");
+            document.getElementById("editarProductoForm").reset();
+            cargarProductos();
+          } catch (error) {
+            console.error(error.message);
+            alert("Error al editar el producto");
+          }
+        });
+
+      function cargarProductos() {
+        fetch("http://localhost:3000/api/productos")
+          .then((response) => response.json())
+          .then((data) => {
+            const tbody = document
+              .getElementById("tablaProductos")
+              .querySelector("tbody");
+            tbody.innerHTML = "";
+            data.forEach((producto) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+              <td>${producto.producto_id}</td>
+              <td>${producto.nombre}</td>
+              <td>${producto.descripcion}</td>
+              <td>${producto.precio}</td>
+            `;
+              tbody.appendChild(row);
+            });
+          })
+          .catch((error) => {
+            console.error("Error al cargar productos:", error);
+          });
+      }
+
+      document
+        .getElementById("checkNombre")
+        .addEventListener("change", function () {
+          document.getElementById("nuevoNombre").disabled = !this.checked;
+        });
+
+      document
+        .getElementById("checkDescripcion")
+        .addEventListener("change", function () {
+          document.getElementById("nuevaDescripcion").disabled = !this.checked;
+        });
+
+      document
+        .getElementById("checkPrecio")
+        .addEventListener("change", function () {
+          document.getElementById("nuevoPrecio").disabled = !this.checked;
+        });
+
+      // Cargar productos al inicio
+      cargarProductos();
+    </script>
+  </body>
+</html>
