@@ -150,6 +150,7 @@
 
         transition: background-color 0.8s ease; /* Animación de transición */
       }
+
       .copy-button {
         background-color: white;
         border: 0;
@@ -161,7 +162,11 @@
       /* Estilos para centrar la tabla horizontalmente */
       .container-table {
         padding-left: -100px;
+        justify-content: center;
+        align-items: center;
       }
+
+
       .tabla-productos {
         width: 50%; /* Establece el ancho al 50% de la página */
         margin: auto; /* Centra horizontalmente la tabla */
@@ -194,7 +199,7 @@
         <input type="number" id="asesor_id" name="asesor_id" required />
         <label for="fecha_venta">Fecha de Venta:</label>
         <input type="date" id="fecha_venta" name="fecha_venta" required />
-        <h2>Productos</h2>
+        <h2 class="title">Productos</h2>
         <div class="container-table">
           <table id="tablaProductos" class="tabla-productos">
             <thead>
